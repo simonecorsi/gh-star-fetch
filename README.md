@@ -1,18 +1,18 @@
 # TODO
 
-- [ ] Remove {{ PROJECT_NAME }} and {{ PROJECT_URL }}
+- [ ] Remove github-starred-fetcher and {{ PROJECT_URL }}
 - [ ] Add `npm_token` secret to github to allow action to publish
 
-# {{ PROJECT_NAME }}
+# github-starred-fetcher
 
 <!-- PROJECT SHIELDS -->
 
-<!-- ![tests](https://github.com/simonecorsi/{{ PROJECT_NAME }}/workflows/test/badge.svg) -->
+<!-- ![tests](https://github.com/simonecorsi/github-starred-fetcher/workflows/test/badge.svg) -->
 
 <!-- toc -->
 
 - [TODO](#todo)
-- [{{ PROJECT_NAME }}](#-project_name-)
+- [github-starred-fetcher](#-project_name-)
   - [About The Project](#about-the-project)
   - [Installation](#installation)
   - [Usage](#usage)
@@ -31,7 +31,7 @@
 ## Installation
 
 ```sh
-npm i --save @scdev/{{ PROJECT_NAME }}
+npm i --save @scdev/github-starred-fetcher
 # OR
 yarn add
 ```

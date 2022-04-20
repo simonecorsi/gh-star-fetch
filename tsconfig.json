@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "target": "ES6",
+    "target": "es2022",
+    "resolveJsonModule": true,
     "esModuleInterop": true,
     "module": "commonjs",
     "outDir": "dist",
