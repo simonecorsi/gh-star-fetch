@@ -77,7 +77,7 @@ tap.test('Should get a single page', async (t) => {
       ],
     },
   });
-  let url = packageJson.repository.url.split('/');
+  const url = packageJson.repository.url.split('/');
   url.pop();
   const username = url.pop();
 
@@ -99,6 +99,42 @@ tap.test('Should get a single page', async (t) => {
   t.equal(Object.keys(full[0]).length, Object.keys(mockResponse[0]).length);
 });
 
+tap.test('Should not select data if trasform is null', async (t) => {
+  const http = client.extend({
+    hooks: {
+      beforeRequest: [
+        (options) => {
+          return new ResponseLike(
+            200,
+            {},
+            Buffer.from(JSON.stringify(mockResponse) as any),
+            options.url.toString()
+          );
+        },
+      ],
+    },
+  });
+  const url = packageJson.repository.url.split('/');
+  url.pop();
+  const username = url.pop();
+
+  // should return transformed response
+  const results = await main({
+    username,
+    http,
+    transform: null,
+  });
+  t.equal(Object.keys(results[0]).length, Object.keys(mockResponse[0]).length);
+
+  // should return full response
+  const full = await main({
+    username,
+    http,
+    transform: null,
+  });
+  t.equal(Object.keys(full[0]).length, Object.keys(mockResponse[0]).length);
+});
+
 tap.test('Should format output compacted by language', async (t) => {
   const http = client.extend({
     hooks: {
@@ -114,7 +150,7 @@ tap.test('Should format output compacted by language', async (t) => {
       ],
     },
   });
-  let url = packageJson.repository.url.split('/');
+  const url = packageJson.repository.url.split('/');
   url.pop();
   const username = url.pop();
   const results = await main({
@@ -139,7 +175,7 @@ tap.test('Should break on error', async (t) => {
       ],
     },
   });
-  let url = packageJson.repository.url.split('/');
+  const url = packageJson.repository.url.split('/');
   url.pop();
   const username = url.pop();
   const results = await main({

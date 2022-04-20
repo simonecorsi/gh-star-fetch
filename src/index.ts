@@ -1,17 +1,8 @@
-// original content by: https://github.com/TriPSs/conventional-changelog-action/blob/master/src/helpers/git.js
-
 import link from './link';
-
-import type {
-  CompactByLanguage,
-  PaginationLink,
-  Stars,
-  Star,
-  ParsedOutput,
-} from './types';
-
 import client from './client';
 import { Got } from 'got/dist/source';
+
+import { CompactByLanguage, PaginationLink, Star, ParsedOutput } from './types';
 
 export function wait(time = 200): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, time));
@@ -59,11 +50,16 @@ async function apiGetStar(url: string, opts: Options): Promise<ParsedOutput> {
     data.push(star);
   }
 
-  if (!opts.compactByLanguage) return data.map((star) => opts.transform(star));
+  if (!opts.compactByLanguage) {
+    if (typeof opts.transform !== 'function') return data;
+    return data.map((star) => opts.transform(star));
+  }
 
   const sorted = data.reduce((acc: CompactByLanguage, val: Star) => {
     const language = val.language || 'miscellaneous';
-    const parsed = opts.transform(val);
+    const parsed =
+      typeof opts.transform !== 'function' ? val : opts.transform(val);
+
     if (!acc[language]) {
       acc[language] = [parsed];
     } else {
@@ -74,7 +70,7 @@ async function apiGetStar(url: string, opts: Options): Promise<ParsedOutput> {
   return sorted;
 }
 
-export function transform(star: Star): Partial<Star> {
+function transform(star: Star): Partial<Star> {
   return {
     id: star.id,
     node_id: star.node_id,
@@ -109,7 +105,7 @@ type Options = {
   compactByLanguage: boolean;
   username: string;
   http: Got;
-  transform: (star: Star) => Partial<Star>;
+  transform: (star: Star) => Partial<Star> | null;
 };
 
 const DEFAULT_OPTIONS: Options = {
