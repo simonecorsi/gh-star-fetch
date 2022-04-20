@@ -7,9 +7,11 @@ import type {
   PaginationLink,
   Stars,
   Star,
-  ApiGetStarResponse,
+  ParsedOutput,
 } from './types';
+
 import client from './client';
+import { Got } from 'got/dist/source';
 
 export function wait(time = 200): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, time));
@@ -29,80 +31,98 @@ export function getNextPage(links: PaginationLink[]): string | null {
 async function* paginateStars(
   url: string,
   opts: Options
-): AsyncGenerator<Stars> {
+): AsyncGenerator<Star> {
   let nextPage: string | null = '1';
   while (nextPage) {
     try {
-      const { headers, body } = await client.get(url, {
+      const { headers, body } = await opts.http.get(url, {
         searchParams: {
           page: nextPage,
         },
       });
-      yield body as unknown as Stars;
+      for (const record of body) {
+        yield record as unknown as Star;
+      }
       if (process.env.NODE_ENV === 'test') break;
       nextPage = getNextPage(link.parse(headers.link).refs);
       await wait(opts.wait || 100); // avoid limits
     } catch (e) {
-      console.error(e);
+      console.error('[http-error]:', e?.response?.body || e);
       break;
     }
   }
 }
 
-async function apiGetStar(
-  url: string,
-  opts: Options
-): Promise<ApiGetStarResponse> {
-  const data: Partial<Star>[] = [];
-  for await (const stars of paginateStars(url, opts)) {
-    for (const star of stars) {
-      data.push({
-        id: star.id,
-        node_id: star.node_id,
-        name: star.name,
-        full_name: star.full_name,
-        owner: {
-          login: star?.owner?.login,
-          id: star?.owner?.id,
-          avatar_url: star?.owner?.avatar_url,
-          url: star?.owner?.url,
-          html_url: star?.owner?.html_url,
-        },
-        html_url: star.html_url,
-        description: star.description,
-        url: star.url,
-        languages_url: star.languages_url,
-        created_at: star.created_at,
-        updated_at: star.updated_at,
-        git_url: star.git_url,
-        ssh_url: star.ssh_url,
-        clone_url: star.clone_url,
-        homepage: star.homepage,
-        stargazers_count: star.stargazers_count,
-        watchers_count: star.watchers_count,
-        language: star.language,
-        topics: star.topics,
-      } as Partial<Star>);
-    }
+async function apiGetStar(url: string, opts: Options): Promise<ParsedOutput> {
+  const data: Star[] = [];
+  for await (const star of paginateStars(url, opts)) {
+    data.push(star);
   }
-  return data as unknown as Stars;
+
+  if (!opts.compactByLanguage) return data.map((star) => opts.transform(star));
+
+  const sorted = data.reduce((acc: CompactByLanguage, val: Star) => {
+    const language = val.language || 'miscellaneous';
+    const parsed = opts.transform(val);
+    if (!acc[language]) {
+      acc[language] = [parsed];
+    } else {
+      acc[language].push(parsed);
+    }
+    return acc;
+  }, {});
+  return sorted;
+}
+
+export function transform(star: Star): Partial<Star> {
+  return {
+    id: star.id,
+    node_id: star.node_id,
+    name: star.name,
+    full_name: star.full_name,
+    owner: {
+      login: star?.owner?.login,
+      id: star?.owner?.id,
+      avatar_url: star?.owner?.avatar_url,
+      url: star?.owner?.url,
+      html_url: star?.owner?.html_url,
+    },
+    html_url: star.html_url,
+    description: star.description,
+    url: star.url,
+    languages_url: star.languages_url,
+    created_at: star.created_at,
+    updated_at: star.updated_at,
+    git_url: star.git_url,
+    ssh_url: star.ssh_url,
+    clone_url: star.clone_url,
+    homepage: star.homepage,
+    stargazers_count: star.stargazers_count,
+    watchers_count: star.watchers_count,
+    language: star.language,
+    topics: star.topics,
+  } as Partial<Star>;
 }
 
 type Options = {
   wait: number;
   compactByLanguage: boolean;
   username: string;
+  http: Got;
+  transform: (star: Star) => Partial<Star>;
 };
 
 const DEFAULT_OPTIONS: Options = {
   wait: 1000,
   compactByLanguage: false,
   username: process.env.GITHUB_USERNAME,
+  http: client,
+  transform,
 };
 
 export default async function main(
   options: Partial<Options> = {}
-): Promise<Stars | CompactByLanguage> {
+): Promise<ParsedOutput> {
   const opts: Options = {
     ...DEFAULT_OPTIONS,
     ...options,
@@ -113,20 +133,5 @@ export default async function main(
 
   const API_STARRED_URL = `users/${opts.username}/starred`;
 
-  const results: Stars = await apiGetStar(API_STARRED_URL, opts);
-
-  if (opts.compactByLanguage) {
-    const sorted = results.reduce((acc: CompactByLanguage, val: Star) => {
-      const language = val.language || 'miscellaneous';
-      if (!acc[language]) {
-        acc[language] = [val];
-      } else {
-        acc[language].push(val);
-      }
-      return acc;
-    }, {});
-    return sorted;
-  }
-
-  return results;
+  return apiGetStar(API_STARRED_URL, opts);
 }

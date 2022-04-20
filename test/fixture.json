@@ -1,0 +1,50 @@
+[
+  {
+    "id": 473356570,
+    "node_id": "R_kgDOHDbZGg",
+    "name": "wild-wild-path",
+    "full_name": "ehmicky/wild-wild-path",
+    "owner": {
+      "login": "ehmicky",
+      "id": 8136211,
+      "avatar_url": "https://avatars.githubusercontent.com/u/8136211?v=4",
+      "url": "https://api.github.com/users/ehmicky",
+      "html_url": "https://github.com/ehmicky"
+    },
+    "html_url": "https://github.com/ehmicky/wild-wild-path",
+    "description": "🤠 Object property paths with wildcards and regexps 🌵",
+    "url": "https://api.github.com/repos/ehmicky/wild-wild-path",
+    "languages_url": "https://api.github.com/repos/ehmicky/wild-wild-path/languages",
+    "created_at": "2022-03-23T20:58:57Z",
+    "updated_at": "2022-04-20T10:42:09Z",
+    "git_url": "git://github.com/ehmicky/wild-wild-path.git",
+    "ssh_url": "git@github.com:ehmicky/wild-wild-path.git",
+    "clone_url": "https://github.com/ehmicky/wild-wild-path.git",
+    "homepage": "",
+    "stargazers_count": 312,
+    "watchers_count": 312,
+    "language": "JavaScript",
+    "topics": [
+      "algorithm",
+      "data-structures",
+      "filter",
+      "functional-programming",
+      "glob",
+      "globbing",
+      "globstar",
+      "javascript",
+      "json",
+      "library",
+      "map",
+      "nodejs",
+      "parsing",
+      "path",
+      "recursion",
+      "regex",
+      "regexp",
+      "regular-expression",
+      "typescript",
+      "wildcard"
+    ]
+  }
+]

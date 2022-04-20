@@ -1,7 +1,9 @@
 import type { Endpoints } from '@octokit/types';
 
+export type ParsedStarsList = Partial<Star>[];
+
 export type CompactByLanguage = {
-  [language: string]: Star[];
+  [language: string]: ParsedStarsList;
 };
 
 export type PaginationLink = {
@@ -10,6 +12,6 @@ export type PaginationLink = {
 };
 
 export type Stars = Endpoints['GET /user/starred']['response']['data'];
-export type Star = Stars[number] | { language: string };
+export type Star = Stars[number] & { language: string };
 
-export type ApiGetStarResponse = Stars;
+export type ParsedOutput = ParsedStarsList | CompactByLanguage;
