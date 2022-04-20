@@ -1,11 +1,10 @@
 {
-  "name": "github-starred-fetcher",
+  "name": "github-star-fetcher",
   "version": "1.0.0-0",
   "description": "desc",
-  "main": "./dist/index.js",
   "types": "./types/index.d.ts",
   "repository": {
-    "url": "https://github.com/simonecorsi/github-starred-fetcher"
+    "url": "https://github.com/simonecorsi/github-star-fetcher"
   },
   "engines": {
     "node": "^12.20.0 || ^14.13.1 || >=16.0.0"

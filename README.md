@@ -1,37 +1,33 @@
 # TODO
 
-- [ ] Remove github-starred-fetcher and {{ PROJECT_URL }}
+- [ ] Remove github-star-fetcher and {{ PROJECT_URL }}
 - [ ] Add `npm_token` secret to github to allow action to publish
 
-# github-starred-fetcher
+# github-star-fetcher
 
 <!-- PROJECT SHIELDS -->
 
-<!-- ![tests](https://github.com/simonecorsi/github-starred-fetcher/workflows/test/badge.svg) -->
+<!-- ![tests](https://github.com/simonecorsi/github-star-fetcher/workflows/test/badge.svg) -->
 
 <!-- toc -->
 
-- [TODO](#todo)
-- [github-starred-fetcher](#-project_name-)
-  - [About The Project](#about-the-project)
-  - [Installation](#installation)
-  - [Usage](#usage)
-  - [Contributing](#contributing)
-  - [License](#license)
-  - [Contact](#contact)
+- [About The Project](#about-the-project)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
 
 <!-- tocstop -->
 
 ## About The Project
-
-
 
 <!-- GETTING STARTED -->
 
 ## Installation
 
 ```sh
-npm i --save @scdev/github-starred-fetcher
+npm i --save @scdev/github-star-fetcher
 # OR
 yarn add
 ```
@@ -39,8 +35,6 @@ yarn add
 <!-- USAGE EXAMPLES -->
 
 ## Usage
-
-
 
 <!-- CONTRIBUTING -->
 
