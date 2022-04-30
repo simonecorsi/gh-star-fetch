@@ -4,8 +4,13 @@ import { Got } from 'got/dist/source';
 
 import { CompactByLanguage, PaginationLink, Star, ParsedOutput } from './types';
 
-export function wait(time = 200): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, time));
+export function wait(time: number): Promise<void> {
+  return new Promise((resolve) => {
+    const tid = setTimeout(() => {
+      resolve();
+      clearTimeout(tid);
+    }, time);
+  });
 }
 
 export function getNextPage(links: PaginationLink[]): string | null {
@@ -34,9 +39,8 @@ async function* paginateStars(
       for (const record of body) {
         yield record as unknown as Star;
       }
-      if (process.env.NODE_ENV === 'test') break;
       nextPage = getNextPage(link.parse(headers.link).refs);
-      await wait(opts.wait || 100); // avoid limits
+      await wait(opts.wait); // avoid limits
     } catch (e) {
       console.error('[http-error]:', e?.response?.body || e);
       break;
