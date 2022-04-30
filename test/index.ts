@@ -69,7 +69,9 @@ tap.test('Should get a single page', async (t) => {
         (options) => {
           return new ResponseLike(
             200,
-            {},
+            {
+              link: '<https://api.github.com/user/5617452/starred?page=1>; rel="last"',
+            },
             Buffer.from(JSON.stringify(mockResponse) as any),
             options.url.toString()
           );
@@ -106,7 +108,9 @@ tap.test('Should not select data if trasform is null', async (t) => {
         (options) => {
           return new ResponseLike(
             200,
-            {},
+            {
+              link: '<https://api.github.com/user/5617452/starred?page=1>; rel="last"',
+            },
             Buffer.from(JSON.stringify(mockResponse) as any),
             options.url.toString()
           );
@@ -142,7 +146,9 @@ tap.test('Should format output compacted by language', async (t) => {
         (options) => {
           return new ResponseLike(
             200,
-            {},
+            {
+              link: '<https://api.github.com/user/5617452/starred?page=1>; rel="last"',
+            },
             Buffer.from(JSON.stringify(mockResponse) as any),
             options.url.toString()
           );
