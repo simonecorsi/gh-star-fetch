@@ -1,3 +1,10 @@
+# [1.0.0-next.2](https://github.com/simonecorsi/gh-star-fetch/compare/v1.0.0-next.1...v1.0.0-next.2) (2022-04-30)
+
+
+### Bug Fixes
+
+* reworked options ([2ecfa64](https://github.com/simonecorsi/gh-star-fetch/commit/2ecfa64da6257e5ad23a3d33a8525b9590d12c85))
+
 # 1.0.0-next.1 (2022-04-30)
 
 
