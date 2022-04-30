@@ -1,10 +1,10 @@
 {
-  "name": "github-star-fetcher",
+  "name": "gh-star-fetch",
   "version": "1.0.0-0",
   "description": "desc",
   "types": "./types/index.d.ts",
   "repository": {
-    "url": "https://github.com/simonecorsi/github-star-fetcher"
+    "url": "https://github.com/simonecorsi/gh-star-fetch"
   },
   "engines": {
     "node": "^12.20.0 || ^14.13.1 || >=16.0.0"

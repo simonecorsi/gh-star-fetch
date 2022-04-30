@@ -1,13 +1,8 @@
-# TODO
-
-- [ ] Remove github-star-fetcher and {{ PROJECT_URL }}
-- [ ] Add `npm_token` secret to github to allow action to publish
-
-# github-star-fetcher
+# gh-star-fetch
 
 <!-- PROJECT SHIELDS -->
 
-<!-- ![tests](https://github.com/simonecorsi/github-star-fetcher/workflows/test/badge.svg) -->
+<!-- ![tests](https://github.com/simonecorsi/gh-star-fetch/workflows/test/badge.svg) -->
 
 <!-- toc -->
 
@@ -22,12 +17,14 @@
 
 ## About The Project
 
+TODO
+
 <!-- GETTING STARTED -->
 
 ## Installation
 
 ```sh
-npm i --save @scdev/github-star-fetcher
+npm i --save @scdev/gh-star-fetch
 # OR
 yarn add
 ```
