@@ -1,17 +1,7 @@
 import link from './link';
-import client from './client';
+import { createClient } from './client';
 import { Got } from 'got/dist/source';
-
 import { CompactByLanguage, PaginationLink, Star, ParsedOutput } from './types';
-
-export function wait(time: number): Promise<void> {
-  return new Promise((resolve) => {
-    const tid = setTimeout(() => {
-      resolve();
-      clearTimeout(tid);
-    }, time);
-  });
-}
 
 export function getNextPage(links: PaginationLink[]): string | null {
   const next = links.find((l) => l.rel === 'next');
@@ -24,15 +14,17 @@ export function getNextPage(links: PaginationLink[]): string | null {
   return matchNext[1];
 }
 
+type paginateStarsOpts = Pick<Options, 'http' | 'accessToken'>;
 async function* paginateStars(
   url: string,
-  opts: Options
+  opts: paginateStarsOpts
 ): AsyncGenerator<Star> {
   let nextPage: string | null = '1';
   while (nextPage) {
     try {
       const { headers, body } = await opts.http.get(url, {
         searchParams: {
+          per_page: 100,
           page: nextPage,
         },
       });
@@ -40,7 +32,13 @@ async function* paginateStars(
         yield record as unknown as Star;
       }
       nextPage = getNextPage(link.parse(headers.link).refs);
-      await wait(opts.wait); // avoid limits
+
+      if (!opts.accessToken) {
+        console.warn(
+          'No github access token provided, limiting call to first page to avoid rate limit ban'
+        );
+        break;
+      }
     } catch (e) {
       console.error('[http-error]:', e?.response?.body || e);
       break;
@@ -48,9 +46,10 @@ async function* paginateStars(
   }
 }
 
-async function apiGetStar(url: string, opts: Options): Promise<ParsedOutput> {
+async function apiGetStar(opts: Options): Promise<ParsedOutput> {
   const data: Star[] = [];
-  for await (const star of paginateStars(url, opts)) {
+  const API_STARRED_URL = `users/${opts.username}/starred`;
+  for await (const star of paginateStars(API_STARRED_URL, opts)) {
     data.push(star);
   }
 
@@ -105,33 +104,41 @@ function transform(star: Star): Partial<Star> {
 }
 
 type Options = {
-  wait: number;
+  accessToken?: string;
   compactByLanguage: boolean;
   username: string;
   http: Got;
   transform: (star: Star) => Partial<Star> | null;
 };
 
-const DEFAULT_OPTIONS: Options = {
-  wait: 1000,
-  compactByLanguage: false,
+const DEFAULT_OPTIONS = {
+  accessToken: process.env.GITHUB_TOKEN,
   username: process.env.GITHUB_USERNAME,
-  http: client,
+  compactByLanguage: false,
   transform,
 };
 
+export function setHttpClient(opts) {
+  // http is provided in opts in test cases env
+  if (opts.http) return opts.http;
+
+  const headers = {};
+  if (opts.accessToken) {
+    (headers as any).Authorization = `token ${opts.accessToken}`;
+  }
+  return createClient({ headers });
+}
+
 export default async function main(
-  options: Partial<Options> = {}
+  options: Partial<Options>
 ): Promise<ParsedOutput> {
-  const opts: Options = {
-    ...DEFAULT_OPTIONS,
-    ...options,
-  };
-  if (!opts.username) {
-    throw new Error('[opts.username] is not set');
+  if (!options.username) {
+    throw new Error('[options.username] is not set');
   }
 
-  const API_STARRED_URL = `users/${opts.username}/starred`;
+  const opts = Object.assign({}, DEFAULT_OPTIONS, options, {
+    http: setHttpClient(options),
+  }) as Options;
 
-  return apiGetStar(API_STARRED_URL, opts);
+  return apiGetStar(opts);
 }

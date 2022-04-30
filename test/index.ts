@@ -1,23 +1,32 @@
 process.env.NODE_ENV = 'test';
 
 import tap from 'tap';
-import main, { getNextPage, wait } from '../src';
+import main, { getNextPage, setHttpClient } from '../src';
 import { PaginationLink } from '../src/types';
 import packageJson from '../package.json';
 import mockResponse from './fixture.json';
-import client from '../src/client';
+import { createClient } from '../src/client';
 import ResponseLike from 'responselike';
 
-tap.test('wait', async (t) => {
-  await wait(10);
+const client = createClient();
+
+tap.test('Throws if no username provided', async (t) => {
+  await t.rejects(() => main({}));
+  t.end();
 });
 
-tap.test('Should throw without [GITHUB_USERNAME]', async (t) => {
-  await t.rejects(main, Error, '[GITHUB_USERNAME] is not set');
+tap.test('Should set accessToken', (t) => {
+  const accessToken = '=asdi89a3ghuiasdioj9u3n19easfbu98q';
+  const client = setHttpClient({ accessToken });
+  t.equal(
+    client.defaults?.options?.headers?.authorization,
+    `token ${accessToken}`
+  );
+  t.end();
 });
 
 // uri: string;
-//   rel: 'next' | 'last' | 'prev' | 'first';
+// rel: 'next' | 'last' | 'prev' | 'first';
 tap.test('Should get next page from parsed links', (t) => {
   t.test('should be null if no links', (t) => {
     t.equal(getNextPage([]), null);
