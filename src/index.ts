@@ -1,42 +1,41 @@
-import link from './link';
-import client from './client';
+import link from 'parse-link-header';
+import { createClient } from './client';
 import { Got } from 'got/dist/source';
+import { CompactByLanguage, Links, Star, ParsedOutput } from './types';
 
-import { CompactByLanguage, PaginationLink, Star, ParsedOutput } from './types';
-
-export function wait(time = 200): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, time));
-}
-
-export function getNextPage(links: PaginationLink[]): string | null {
-  const next = links.find((l) => l.rel === 'next');
-  const last = links.find((l) => l.rel === 'last');
+export function getNextPage({ next, last }: Links): string | null {
   if (!next || !last) return null;
-  const matchNext = next.uri.match(/page=([0-9]*)/);
-  const matchLast = last.uri.match(/page=([0-9]*)/);
-  if (!matchNext || !matchLast) return null;
-  if (matchNext[1] === matchLast[1]) return null;
-  return matchNext[1];
+  if (!next?.page || !last?.page) return null;
+  if (next.page === last.page) return null;
+  return next.page;
 }
 
+type paginateStarsOpts = Pick<Options, 'http' | 'accessToken'>;
 async function* paginateStars(
   url: string,
-  opts: Options
+  opts: paginateStarsOpts
 ): AsyncGenerator<Star> {
   let nextPage: string | null = '1';
   while (nextPage) {
     try {
       const { headers, body } = await opts.http.get(url, {
         searchParams: {
+          per_page: 100,
           page: nextPage,
         },
       });
       for (const record of body) {
         yield record as unknown as Star;
       }
-      if (process.env.NODE_ENV === 'test') break;
-      nextPage = getNextPage(link.parse(headers.link).refs);
-      await wait(opts.wait || 100); // avoid limits
+
+      nextPage = getNextPage(link(headers.link));
+
+      if (!opts.accessToken) {
+        console.warn(
+          'No github access token provided, limiting call to first page to avoid rate limit ban'
+        );
+        break;
+      }
     } catch (e) {
       console.error('[http-error]:', e?.response?.body || e);
       break;
@@ -44,9 +43,10 @@ async function* paginateStars(
   }
 }
 
-async function apiGetStar(url: string, opts: Options): Promise<ParsedOutput> {
+async function apiGetStar(opts: Options): Promise<ParsedOutput> {
   const data: Star[] = [];
-  for await (const star of paginateStars(url, opts)) {
+  const API_STARRED_URL = `users/${opts.username}/starred`;
+  for await (const star of paginateStars(API_STARRED_URL, opts)) {
     data.push(star);
   }
 
@@ -101,33 +101,41 @@ function transform(star: Star): Partial<Star> {
 }
 
 type Options = {
-  wait: number;
+  accessToken?: string;
   compactByLanguage: boolean;
   username: string;
   http: Got;
   transform: (star: Star) => Partial<Star> | null;
 };
 
-const DEFAULT_OPTIONS: Options = {
-  wait: 1000,
-  compactByLanguage: false,
+const DEFAULT_OPTIONS = {
+  accessToken: process.env.GITHUB_TOKEN,
   username: process.env.GITHUB_USERNAME,
-  http: client,
+  compactByLanguage: false,
   transform,
 };
 
+export function setHttpClient(opts) {
+  // http is provided in opts in test cases env
+  if (opts.http) return opts.http;
+
+  const headers = {};
+  if (opts.accessToken) {
+    (headers as any).Authorization = `token ${opts.accessToken}`;
+  }
+  return createClient({ headers });
+}
+
 export default async function main(
-  options: Partial<Options> = {}
+  options: Partial<Options>
 ): Promise<ParsedOutput> {
-  const opts: Options = {
-    ...DEFAULT_OPTIONS,
-    ...options,
-  };
-  if (!opts.username) {
-    throw new Error('[opts.username] is not set');
+  if (!options.username) {
+    throw new Error('[options.username] is not set');
   }
 
-  const API_STARRED_URL = `users/${opts.username}/starred`;
+  const opts = Object.assign({}, DEFAULT_OPTIONS, options, {
+    http: setHttpClient(options),
+  }) as Options;
 
-  return apiGetStar(API_STARRED_URL, opts);
+  return apiGetStar(opts);
 }

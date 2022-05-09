@@ -1,7 +1,7 @@
 {
   "name": "gh-star-fetch",
-  "version": "1.0.0-0",
-  "description": "desc",
+  "version": "1.0.0-next.2",
+  "description": "Fetch all the starred repositories for a GitHub user",
   "types": "./types/index.d.ts",
   "repository": {
     "url": "https://github.com/simonecorsi/gh-star-fetch"
@@ -21,6 +21,8 @@
   },
   "keywords": [
     "github",
+    "star",
+    "stars",
     "starred",
     "extract",
     "fetch",
@@ -42,7 +44,7 @@
   },
   "devDependencies": {
     "@commitlint/cli": "^16.0.2",
-    "@commitlint/config-conventional": "^16.0.0",
+    "@commitlint/config-conventional": "^16.2.4",
     "@istanbuljs/esm-loader-hook": "^0.1.2",
     "@octokit/types": "^6.34.0",
     "@saithodev/semantic-release-backmerge": "^2.0.0",
@@ -52,26 +54,27 @@
     "@semantic-release/github": "^8.0.2",
     "@semantic-release/npm": "^9.0.0",
     "@semantic-release/release-notes-generator": "^10.0.2",
-    "@types/tap": "^15.0.5",
+    "@types/tap": "^15.0.7",
     "@typescript-eslint/eslint-plugin": "^5.20.0",
     "@typescript-eslint/parser": "^5.20.0",
-    "eslint": "^8.13.0",
+    "eslint": "^8.14.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.0.0",
     "husky": "^7.0.4",
     "is-ci": "^3.0.0",
-    "lint-staged": "^12.1.7",
+    "lint-staged": "^12.4.1",
     "markdown-toc": "^1.2.0",
     "nyc": "^15.1.0",
     "prettier": "^2.3.2",
     "responselike": "^2.0.0",
-    "tap": "^16.0.1",
+    "tap": "^16.1.0",
     "ts-node": "^10.7.0",
-    "typescript": "^4.6.3"
+    "typescript": "^4.6.4"
   },
   "dependencies": {
-    "got": "^11.8.3"
+    "got": "^12.0.4",
+    "parse-link-header": "^2.0.0"
   },
   "volta": {
     "node": "16.14.2",
