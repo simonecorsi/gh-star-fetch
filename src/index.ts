@@ -129,13 +129,19 @@ export function setHttpClient(opts) {
 export default async function main(
   options: Partial<Options>
 ): Promise<ParsedOutput> {
-  if (!options.username) {
-    throw new Error('[options.username] is not set');
-  }
-
+  const http = setHttpClient(options);
   const opts = Object.assign({}, DEFAULT_OPTIONS, options, {
-    http: setHttpClient(options),
+    http,
   }) as Options;
+
+  if (!options.username) {
+    try {
+      const { login } = await http.get('user').json();
+      options.username = login;
+    } catch {
+      throw new Error('[options.username] is not set');
+    }
+  }
 
   return apiGetStar(opts);
 }
