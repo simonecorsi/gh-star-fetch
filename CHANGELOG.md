@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/simonecorsi/gh-star-fetch/compare/v1.0.0...v1.1.0) (2022-05-09)
+
+
+### Features
+
+* username retrieved by current token ([5cb9b87](https://github.com/simonecorsi/gh-star-fetch/commit/5cb9b8751679dd0c9ab1f34a4e53949b4bfe7093))
+
 # 1.0.0 (2022-05-09)
 
 
