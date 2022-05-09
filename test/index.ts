@@ -1,37 +1,35 @@
 process.env.NODE_ENV = 'test';
 
 import tap from 'tap';
-import main, { getNextPage, wait } from '../src';
-import { PaginationLink } from '../src/types';
+import main, { getNextPage, setHttpClient } from '../src';
+import { Links } from '../src/types';
 import packageJson from '../package.json';
 import mockResponse from './fixture.json';
-import client from '../src/client';
+import { createClient } from '../src/client';
 import ResponseLike from 'responselike';
 
-tap.test('wait', async (t) => {
-  await wait(10);
+const client = createClient();
+
+tap.test('Throws if no username provided', async (t) => {
+  await t.rejects(() => main({}));
+  t.end();
 });
 
-tap.test('Should throw without [GITHUB_USERNAME]', async (t) => {
-  await t.rejects(main, Error, '[GITHUB_USERNAME] is not set');
+tap.test('Should set accessToken', (t) => {
+  const accessToken = '=asdi89a3ghuiasdioj9u3n19easfbu98q';
+  const client = setHttpClient({ accessToken });
+  t.equal(
+    client.defaults?.options?.headers?.authorization,
+    `token ${accessToken}`
+  );
+  t.end();
 });
 
-// uri: string;
-//   rel: 'next' | 'last' | 'prev' | 'first';
+// url: string;
+// rel: 'next' | 'last' | 'prev' | 'first';
 tap.test('Should get next page from parsed links', (t) => {
   t.test('should be null if no links', (t) => {
-    t.equal(getNextPage([]), null);
-    t.end();
-  });
-
-  t.test('should be null if cant parse next page number', (t) => {
-    t.equal(
-      getNextPage([
-        { uri: 'next', rel: 'next' },
-        { uri: 'last', rel: 'last' },
-      ]),
-      null
-    );
+    t.equal(getNextPage({} as any), null);
     t.end();
   });
 
@@ -39,10 +37,10 @@ tap.test('Should get next page from parsed links', (t) => {
     'should be null if nextPage is currentPage, we are done paginating',
     (t) => {
       t.equal(
-        getNextPage([
-          { uri: 'http://invalid.ajeje/?page=1', rel: 'next' },
-          { uri: 'http://invalid.ajeje/?page=1', rel: 'last' },
-        ]),
+        getNextPage({
+          next: { page: '1', rel: 'next' } as any,
+          last: { page: '1', rel: 'last' } as any,
+        }),
         null
       );
       t.end();
@@ -50,12 +48,11 @@ tap.test('Should get next page from parsed links', (t) => {
   );
 
   t.test('should return next page url', (t) => {
-    const links: PaginationLink[] = [
-      { uri: 'http://invalid.ajeje/?page=1', rel: 'last' },
-      { uri: 'http://invalid.ajeje/?page=2', rel: 'next' },
-    ];
-    const uri = links[1].uri;
-    t.equal(getNextPage(links), uri.charAt(uri.length - 1));
+    const links: Links = {
+      next: { page: '1' } as any,
+      last: { page: '2' } as any,
+    };
+    t.equal(getNextPage(links), links.next.page);
     t.end();
   });
 
@@ -69,7 +66,9 @@ tap.test('Should get a single page', async (t) => {
         (options) => {
           return new ResponseLike(
             200,
-            {},
+            {
+              link: '<https://api.github.com/user/5617452/starred?page=1>; rel="last"',
+            },
             Buffer.from(JSON.stringify(mockResponse) as any),
             options.url.toString()
           );
@@ -106,7 +105,9 @@ tap.test('Should not select data if trasform is null', async (t) => {
         (options) => {
           return new ResponseLike(
             200,
-            {},
+            {
+              link: '<https://api.github.com/user/5617452/starred?page=1>; rel="last"',
+            },
             Buffer.from(JSON.stringify(mockResponse) as any),
             options.url.toString()
           );
@@ -142,7 +143,9 @@ tap.test('Should format output compacted by language', async (t) => {
         (options) => {
           return new ResponseLike(
             200,
-            {},
+            {
+              link: '<https://api.github.com/user/5617452/starred?page=1>; rel="last"',
+            },
             Buffer.from(JSON.stringify(mockResponse) as any),
             options.url.toString()
           );

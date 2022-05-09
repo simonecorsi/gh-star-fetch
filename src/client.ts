@@ -1,22 +1,34 @@
-import got, { ExtendOptions } from 'got';
+import got, { Got, ExtendOptions } from 'got';
 
-const options = {
-  headers: {},
-  prefixUrl: process.env.GITHUB_API_URL || 'https://api.github.com',
+function wait(time: number): Promise<void> {
+  return new Promise((resolve) => {
+    const tid = setTimeout(() => {
+      resolve();
+      clearTimeout(tid);
+    }, time);
+  });
+}
+
+function rand(min, max) {
+  // min and max included
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+const DEFAULT_OPTIONS: Got | ExtendOptions = {
+  prefixUrl: 'https://api.github.com',
   responseType: 'json',
-  hooks: {},
+  hooks: {
+    beforeRequest: [
+      async () => {
+        // reduce rate limits
+        await wait(rand(10, 25));
+      },
+    ],
+  },
 };
 
-/* istanbul ignore next */
-if (!process.env.GITHUB_TOKEN && process.env.NODE_ENV !== 'test') {
-  throw new Error('[GITHUB_TOKEN] is not set');
-}
+const client = got.extend(DEFAULT_OPTIONS);
 
-/* istanbul ignore next */
-if (process.env.GITHUB_TOKEN) {
-  options.headers = {
-    Authorization: `token ${process.env.GITHUB_TOKEN}`,
-  };
-}
-
-export default got.extend(options as ExtendOptions);
+export const createClient = (opts?: Got | ExtendOptions) => {
+  return client.extend(opts || {});
+};
