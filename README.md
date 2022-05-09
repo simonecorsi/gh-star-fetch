@@ -38,7 +38,6 @@ yarn add gh-star-fetch
 
 ```javascript
 const results = await ghStarFetch({
-  username: '<USERNAME>',
   accessToken: '<GITHUB_PERSONAL_ACCESS_TOKEN>',
 });
 ```
@@ -47,8 +46,8 @@ const results = await ghStarFetch({
 
 | name                | type                            | default | description                                                                                                                               |
 | ------------------- | ------------------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `accessToken`       | `String`                        | ``      | This is you github [PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) |
-| `username`          | `String`                        | ``      | This is the username of the user to scrape                                                                                                |
+| `accessToken`       | `String`                        |         | This is you github [PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) |
+| `username`          | `String`                        |         | Default to the username of the accessToken, if changed scrapes another user's stars                                                       |
 | `compactByLanguage` | `Bool`                          | `false` | Instead of a single array, output will be compacted by languages                                                                          |
 | `http`              | `http.Client`                   | `Got`   | This is the HTTP client used to fetch data                                                                                                |
 | `transform`         | `(star: Star) => Partial<Star>` |         | You can transform each star object before its pushed to the output array with this callback                                               |
