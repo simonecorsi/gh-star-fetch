@@ -1,17 +1,13 @@
-import link from './link';
+import link from 'parse-link-header';
 import { createClient } from './client';
 import { Got } from 'got/dist/source';
-import { CompactByLanguage, PaginationLink, Star, ParsedOutput } from './types';
+import { CompactByLanguage, Links, Star, ParsedOutput } from './types';
 
-export function getNextPage(links: PaginationLink[]): string | null {
-  const next = links.find((l) => l.rel === 'next');
-  const last = links.find((l) => l.rel === 'last');
+export function getNextPage({ next, last }: Links): string | null {
   if (!next || !last) return null;
-  const matchNext = next.uri.match(/page=([0-9]*)/);
-  const matchLast = last.uri.match(/page=([0-9]*)/);
-  if (!matchNext || !matchLast) return null;
-  if (matchNext[1] === matchLast[1]) return null;
-  return matchNext[1];
+  if (!next?.page || !last?.page) return null;
+  if (next.page === last.page) return null;
+  return next.page;
 }
 
 type paginateStarsOpts = Pick<Options, 'http' | 'accessToken'>;
@@ -31,7 +27,8 @@ async function* paginateStars(
       for (const record of body) {
         yield record as unknown as Star;
       }
-      nextPage = getNextPage(link.parse(headers.link).refs);
+
+      nextPage = getNextPage(link(headers.link));
 
       if (!opts.accessToken) {
         console.warn(

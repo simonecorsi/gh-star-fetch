@@ -9,6 +9,7 @@
 - [About The Project](#about-the-project)
 - [Installation](#installation)
 - [Usage](#usage)
+- [Options](#options)
 - [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
@@ -17,21 +18,40 @@
 
 ## About The Project
 
-TODO
+> Fetch all the starred repositories for a GitHub user
+
+This packages helps in retrieving all the starred repositories for a given github user
 
 <!-- GETTING STARTED -->
 
 ## Installation
 
 ```sh
-npm i --save @scdev/gh-star-fetch
+npm i --save gh-star-fetch
 # OR
-yarn add
+yarn add gh-star-fetch
 ```
 
 <!-- USAGE EXAMPLES -->
 
 ## Usage
+
+```javascript
+const results = await ghStarFetch({
+  username: '<USERNAME>',
+  accessToken: '<GITHUB_PERSONAL_ACCESS_TOKEN>',
+});
+```
+
+## Options
+
+| name                | type                            | default | description                                                                                                                               |
+| ------------------- | ------------------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `accessToken`       | `String`                        | ``      | This is you github [PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) |
+| `username`          | `String`                        | ``      | This is the username of the user to scrape                                                                                                |
+| `compactByLanguage` | `Bool`                          | `false` | Instead of a single array, output will be compacted by languages                                                                          |
+| `http`              | `http.Client`                   | `Got`   | This is the HTTP client used to fetch data                                                                                                |
+| `transform`         | `(star: Star) => Partial<Star>` |         | You can transform each star object before its pushed to the output array with this callback                                               |
 
 <!-- CONTRIBUTING -->
 
@@ -39,7 +59,7 @@ yarn add
 
 Project is pretty simple and straight forward for what is my needs, but if you have any idea you're welcome.
 
-This projects uses [commitizen](https://github.com/commitizen/cz-cli) so be sure to use standard commit format or PR won't be accepted
+This projects uses [commitlint](https://commitlint.js.org/) with Angular configuration so be sure to use standard commit format or PR won't be accepted.
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)

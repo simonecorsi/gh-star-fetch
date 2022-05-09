@@ -2,7 +2,7 @@ process.env.NODE_ENV = 'test';
 
 import tap from 'tap';
 import main, { getNextPage, setHttpClient } from '../src';
-import { PaginationLink } from '../src/types';
+import { Links } from '../src/types';
 import packageJson from '../package.json';
 import mockResponse from './fixture.json';
 import { createClient } from '../src/client';
@@ -25,22 +25,11 @@ tap.test('Should set accessToken', (t) => {
   t.end();
 });
 
-// uri: string;
+// url: string;
 // rel: 'next' | 'last' | 'prev' | 'first';
 tap.test('Should get next page from parsed links', (t) => {
   t.test('should be null if no links', (t) => {
-    t.equal(getNextPage([]), null);
-    t.end();
-  });
-
-  t.test('should be null if cant parse next page number', (t) => {
-    t.equal(
-      getNextPage([
-        { uri: 'next', rel: 'next' },
-        { uri: 'last', rel: 'last' },
-      ]),
-      null
-    );
+    t.equal(getNextPage({} as any), null);
     t.end();
   });
 
@@ -48,10 +37,10 @@ tap.test('Should get next page from parsed links', (t) => {
     'should be null if nextPage is currentPage, we are done paginating',
     (t) => {
       t.equal(
-        getNextPage([
-          { uri: 'http://invalid.ajeje/?page=1', rel: 'next' },
-          { uri: 'http://invalid.ajeje/?page=1', rel: 'last' },
-        ]),
+        getNextPage({
+          next: { page: '1', rel: 'next' } as any,
+          last: { page: '1', rel: 'last' } as any,
+        }),
         null
       );
       t.end();
@@ -59,12 +48,11 @@ tap.test('Should get next page from parsed links', (t) => {
   );
 
   t.test('should return next page url', (t) => {
-    const links: PaginationLink[] = [
-      { uri: 'http://invalid.ajeje/?page=1', rel: 'last' },
-      { uri: 'http://invalid.ajeje/?page=2', rel: 'next' },
-    ];
-    const uri = links[1].uri;
-    t.equal(getNextPage(links), uri.charAt(uri.length - 1));
+    const links: Links = {
+      next: { page: '1' } as any,
+      last: { page: '2' } as any,
+    };
+    t.equal(getNextPage(links), links.next.page);
     t.end();
   });
 

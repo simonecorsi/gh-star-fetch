@@ -1,4 +1,4 @@
-import got, { Options } from 'got';
+import got, { Got, ExtendOptions } from 'got';
 
 function wait(time: number): Promise<void> {
   return new Promise((resolve) => {
@@ -14,7 +14,7 @@ function rand(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-const DEFAULT_OPTIONS: Options = {
+const DEFAULT_OPTIONS: Got | ExtendOptions = {
   prefixUrl: 'https://api.github.com',
   responseType: 'json',
   hooks: {
@@ -29,6 +29,6 @@ const DEFAULT_OPTIONS: Options = {
 
 const client = got.extend(DEFAULT_OPTIONS);
 
-export const createClient = (opts?: Options) => {
+export const createClient = (opts?: Got | ExtendOptions) => {
   return client.extend(opts || {});
 };
