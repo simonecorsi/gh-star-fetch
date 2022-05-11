@@ -1,6 +1,6 @@
 {
   "name": "gh-star-fetch",
-  "version": "1.3.0-0",
+  "version": "1.3.0",
   "description": "Fetch all the starred repositories for a GitHub user",
   "types": "./types/index.d.ts",
   "main": "./dist/index.js",

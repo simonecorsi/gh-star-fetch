@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/simonecorsi/gh-star-fetch/compare/v1.2.0...v1.3.0) (2022-05-11)
+
+
+### Features
+
+* trigger release ([c3b9e71](https://github.com/simonecorsi/gh-star-fetch/commit/c3b9e71d8ececd182ba61fa4df0a4a8188ca439e))
+
 # [1.2.0](https://github.com/simonecorsi/gh-star-fetch/compare/v1.1.0...v1.2.0) (2022-05-11)
 
 
