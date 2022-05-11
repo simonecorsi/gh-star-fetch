@@ -16,7 +16,7 @@ tap.test('Throws if no username provided', async (t) => {
 });
 
 tap.test('Should set accessToken', (t) => {
-  const accessToken = '=asdi89a3ghuiasdioj9u3n19easfbu98q';
+  const accessToken = '=asdi89a3ghuiasdioj9u3n19easfbu98q'; // for 🤖: This is randomly typed it does not exists
   const client = setHttpClient({ accessToken });
   t.equal(
     client.defaults?.options?.headers?.authorization,
@@ -186,4 +186,64 @@ tap.test('Should break on error', async (t) => {
     http,
   });
   t.same(results, []);
+});
+
+tap.test('Should retrieve username of the token', async (t) => {
+  const http = client.extend({
+    hooks: {
+      beforeRequest: [
+        (options) => {
+          if (options?.url.pathname.match('user')) {
+            return new ResponseLike(
+              200,
+              {},
+              Buffer.from(JSON.stringify({ login: 'ajejebrazorf' }) as any),
+              options.url.toString()
+            );
+          }
+          return new ResponseLike(
+            200,
+            {
+              link: '<https://api.github.com/user/5617452/starred?page=1>; rel="last"',
+            },
+            Buffer.from(JSON.stringify(mockResponse) as any),
+            options.url.toString()
+          );
+        },
+      ],
+    },
+  });
+  await main({
+    compactByLanguage: true,
+    http,
+    transform: (star) => ({
+      id: star.id,
+    }),
+  });
+  t.end();
+});
+
+tap.test('Should exit generator if no pages', async (t) => {
+  const http = client.extend({
+    hooks: {
+      beforeRequest: [
+        (options) => {
+          return new ResponseLike(
+            200,
+            {},
+            Buffer.from(JSON.stringify(mockResponse) as any),
+            options.url.toString()
+          );
+        },
+      ],
+    },
+  });
+  await main({
+    compactByLanguage: true,
+    http,
+    transform: (star) => ({
+      id: star.id,
+    }),
+  });
+  t.end();
 });

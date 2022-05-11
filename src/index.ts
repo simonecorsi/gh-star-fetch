@@ -59,14 +59,13 @@ async function apiGetStar(opts: Options): Promise<ParsedOutput> {
 
   const sorted = data.reduce((acc: CompactByLanguage, val: Star) => {
     const language = val.language || 'miscellaneous';
+    acc[language] ||= [];
+
     const parsed =
       typeof opts.transform !== 'function' ? val : opts.transform(val);
 
-    if (!acc[language]) {
-      acc[language] = [parsed];
-    } else {
-      acc[language].push(parsed);
-    }
+    acc[language].push(parsed);
+
     return acc;
   }, {});
   return sorted;
