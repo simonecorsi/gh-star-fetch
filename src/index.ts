@@ -28,7 +28,9 @@ async function* paginateStars(
         yield record as unknown as Star;
       }
 
-      nextPage = getNextPage(link(headers.link));
+      const links = link(headers.link);
+      if (!links) return; // exit if no page
+      nextPage = getNextPage(links);
 
       if (!opts.accessToken) {
         console.warn(
@@ -134,10 +136,10 @@ export default async function main(
     http,
   }) as Options;
 
-  if (!options.username) {
+  if (!opts.username) {
     try {
       const { login } = await http.get('user').json();
-      options.username = login;
+      opts.username = login;
     } catch {
       throw new Error('[options.username] is not set');
     }
