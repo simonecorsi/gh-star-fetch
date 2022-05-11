@@ -20,7 +20,7 @@
 
 > Fetch all the starred repositories for a GitHub user
 
-This packages helps in retrieving all the starred repositories for a given github user
+This packages helps in retrieving all the starred repositories for a given github user. This was usefull to me before moving to graphql gh api, I'm leaving this here just for easier usage.
 
 <!-- GETTING STARTED -->
 
