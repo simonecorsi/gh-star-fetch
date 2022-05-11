@@ -4,7 +4,6 @@ import { Got } from 'got/dist/source';
 import { CompactByLanguage, Links, Star, ParsedOutput } from './types';
 
 export function getNextPage({ next, last }: Links): string | null {
-  if (!next || !last) return null;
   if (!next?.page || !last?.page) return null;
   if (next.page === last.page) return null;
   return next.page;
