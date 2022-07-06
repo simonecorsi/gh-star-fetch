@@ -119,7 +119,7 @@ function transform(star: Star): Partial<Star> {
   } as Partial<Star>;
 }
 
-type Options = {
+export type Options = {
   accessToken?: string;
   compactByLanguage: boolean;
   compactByTopic: boolean;
