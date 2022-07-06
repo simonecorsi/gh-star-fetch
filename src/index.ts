@@ -50,6 +50,32 @@ async function* paginateStars(
   }
 }
 
+export function compactByLanguage(data, _transform = transform) {
+  return data.reduce((acc: CompactByLanguage, val: Star) => {
+    const language = val.language || 'miscellaneous';
+    acc[language] ||= [];
+
+    const parsed = typeof _transform !== 'function' ? val : _transform(val);
+
+    acc[language].push(parsed);
+
+    return acc;
+  }, {});
+}
+
+export function compactByTopic(data, _transform = transform) {
+  return data.reduce((acc: CompactByTopic, val: Star) => {
+    if (!Array.isArray(val.topics)) return acc;
+    const topics = val.topics.length === 0 ? ['miscellaneous'] : val.topics;
+    for (const topic of topics) {
+      if (!Array.isArray(acc[topic])) acc[topic] = [];
+      const parsed = typeof _transform !== 'function' ? val : _transform(val);
+      acc[topic].push(parsed);
+    }
+    return acc;
+  }, {});
+}
+
 async function apiGetStar(opts: Options): Promise<ParsedOutput> {
   const data: Star[] = [];
   const API_STARRED_URL = `users/${opts.username}/starred`;
@@ -58,31 +84,11 @@ async function apiGetStar(opts: Options): Promise<ParsedOutput> {
   }
 
   if (opts.compactByLanguage) {
-    return data.reduce((acc: CompactByLanguage, val: Star) => {
-      const language = val.language || 'miscellaneous';
-      acc[language] ||= [];
-
-      const parsed =
-        typeof opts.transform !== 'function' ? val : opts.transform(val);
-
-      acc[language].push(parsed);
-
-      return acc;
-    }, {});
+    return compactByLanguage(data, opts.transform);
   }
 
   if (opts.compactByTopic) {
-    return data.reduce((acc: CompactByTopic, val: Star) => {
-      if (!Array.isArray(val.topics)) return acc;
-      const topics = val.topics.length === 0 ? ['miscellaneous'] : val.topics;
-      for (const topic of topics) {
-        if (!Array.isArray(acc[topic])) acc[topic] = [];
-        const parsed =
-          typeof opts.transform !== 'function' ? val : opts.transform(val);
-        acc[topic].push(parsed);
-      }
-      return acc;
-    }, {});
+    return compactByTopic(data, opts.transform);
   }
 
   if (typeof opts.transform !== 'function') return data;
@@ -125,7 +131,7 @@ export type Options = {
   compactByTopic: boolean;
   username: string;
   http: Got;
-  transform: (star: Star) => Partial<Star> | null;
+  transform: ((star: Star) => Partial<Star>) | null;
 };
 
 const DEFAULT_OPTIONS = {
