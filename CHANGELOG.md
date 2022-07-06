@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/simonecorsi/gh-star-fetch/compare/v1.4.0...v1.4.1) (2022-07-06)
+
+
+### Bug Fixes
+
+* export ts options ([8a96f88](https://github.com/simonecorsi/gh-star-fetch/commit/8a96f8832e0973320375303b21a60c96845c37e1))
+
 # [1.4.0](https://github.com/simonecorsi/gh-star-fetch/compare/v1.3.0...v1.4.0) (2022-07-06)
 
 
