@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/simonecorsi/gh-star-fetch/compare/v1.4.1...v1.5.0) (2022-07-06)
+
+
+### Features
+
+* export compact by lang and topic as fnc ([cb881d5](https://github.com/simonecorsi/gh-star-fetch/commit/cb881d53167aeba722aaebdd2df12056935ddcb7))
+
 ## [1.4.1](https://github.com/simonecorsi/gh-star-fetch/compare/v1.4.0...v1.4.1) (2022-07-06)
 
 
