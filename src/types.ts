@@ -6,6 +6,8 @@ export type CompactByLanguage = {
   [language: string]: ParsedStarsList;
 };
 
+export type CompactByTopic = CompactByLanguage;
+
 export type PaginationLink = {
   url: string;
   rel: 'next' | 'last' | 'prev' | 'first';

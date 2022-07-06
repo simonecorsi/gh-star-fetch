@@ -168,6 +168,37 @@ tap.test('Should format output compacted by language', async (t) => {
   t.same(results, { JavaScript: [{ id: mockResponse[0].id }] });
 });
 
+tap.test('Should format output compacted by topics', async (t) => {
+  const http = client.extend({
+    hooks: {
+      beforeRequest: [
+        (options) => {
+          return new ResponseLike(
+            200,
+            {
+              link: '<https://api.github.com/user/5617452/starred?page=1>; rel="last"',
+            },
+            Buffer.from(JSON.stringify(mockResponse) as any),
+            options.url.toString()
+          );
+        },
+      ],
+    },
+  });
+  const url = packageJson.repository.url.split('/');
+  url.pop();
+  const username = url.pop();
+  const results = await main({
+    compactByTopic: true,
+    username,
+    http,
+    transform: (star) => ({
+      id: star.id,
+    }),
+  });
+  t.ok(results['algorithm']);
+});
+
 tap.test('Should break on error', async (t) => {
   const http = client.extend({
     hooks: {

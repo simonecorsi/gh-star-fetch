@@ -1,7 +1,13 @@
 import link from 'parse-link-header';
 import { createClient } from './client';
 import { Got } from 'got/dist/source';
-import { CompactByLanguage, Links, Star, ParsedOutput } from './types';
+import {
+  CompactByLanguage,
+  CompactByTopic,
+  Links,
+  Star,
+  ParsedOutput,
+} from './types';
 
 export function getNextPage({ next, last }: Links): string | null {
   if (!next?.page || !last?.page) return null;
@@ -51,23 +57,36 @@ async function apiGetStar(opts: Options): Promise<ParsedOutput> {
     data.push(star);
   }
 
-  if (!opts.compactByLanguage) {
-    if (typeof opts.transform !== 'function') return data;
-    return data.map((star) => opts.transform(star));
+  if (opts.compactByLanguage) {
+    return data.reduce((acc: CompactByLanguage, val: Star) => {
+      const language = val.language || 'miscellaneous';
+      acc[language] ||= [];
+
+      const parsed =
+        typeof opts.transform !== 'function' ? val : opts.transform(val);
+
+      acc[language].push(parsed);
+
+      return acc;
+    }, {});
   }
 
-  const sorted = data.reduce((acc: CompactByLanguage, val: Star) => {
-    const language = val.language || 'miscellaneous';
-    acc[language] ||= [];
+  if (opts.compactByTopic) {
+    return data.reduce((acc: CompactByTopic, val: Star) => {
+      if (!Array.isArray(val.topics)) return acc;
+      const topics = val.topics.length === 0 ? ['miscellaneous'] : val.topics;
+      for (const topic of topics) {
+        if (!Array.isArray(acc[topic])) acc[topic] = [];
+        const parsed =
+          typeof opts.transform !== 'function' ? val : opts.transform(val);
+        acc[topic].push(parsed);
+      }
+      return acc;
+    }, {});
+  }
 
-    const parsed =
-      typeof opts.transform !== 'function' ? val : opts.transform(val);
-
-    acc[language].push(parsed);
-
-    return acc;
-  }, {});
-  return sorted;
+  if (typeof opts.transform !== 'function') return data;
+  return data.map((star) => opts.transform(star));
 }
 
 function transform(star: Star): Partial<Star> {
@@ -103,6 +122,7 @@ function transform(star: Star): Partial<Star> {
 type Options = {
   accessToken?: string;
   compactByLanguage: boolean;
+  compactByTopic: boolean;
   username: string;
   http: Got;
   transform: (star: Star) => Partial<Star> | null;
@@ -112,6 +132,7 @@ const DEFAULT_OPTIONS = {
   accessToken: process.env.GITHUB_TOKEN,
   username: process.env.GITHUB_USERNAME,
   compactByLanguage: false,
+  compactByTopic: false,
   transform,
 };
 
