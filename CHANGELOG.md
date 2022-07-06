@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/simonecorsi/gh-star-fetch/compare/v1.3.0...v1.4.0) (2022-07-06)
+
+
+### Features
+
+* compact results by gh topics ([9635f99](https://github.com/simonecorsi/gh-star-fetch/commit/9635f991d4ef11ad51e218c6fdc14d9e05705713))
+
 # [1.3.0](https://github.com/simonecorsi/gh-star-fetch/compare/v1.2.0...v1.3.0) (2022-05-11)
 
 
